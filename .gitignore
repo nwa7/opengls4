@@ -1,0 +1,8 @@
+*.pdf
+*.o
+*.out
+*.d
+*.txt
+.vscode
+/build
+.cache/
