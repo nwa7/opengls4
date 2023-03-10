@@ -5,7 +5,7 @@
 #include <iostream>
 
 using namespace glimac;
-
+// BZBZBZBZBZ
 struct Vertex2DUV {
   glm::vec2 position;
   glm::vec2 texture;
