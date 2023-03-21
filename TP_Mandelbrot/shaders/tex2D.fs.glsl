@@ -2,8 +2,8 @@
 
 in vec2 vText;
 
-out vec2 fFragText;
+out vec3 outColor;
 
 void main() {
-    fFragText = vText;
+    outColor = vec3(1.0,0.0,0.0);
 }

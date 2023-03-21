@@ -5,7 +5,7 @@
 #include <iostream>
 
 using namespace glimac;
-// BZBZBZBZBZ
+
 struct Vertex2DUV {
   glm::vec2 position;
   glm::vec2 texture;
@@ -14,11 +14,16 @@ struct Vertex2DUV {
     position = pos;
     texture = text;
   };
+
+  Vertex2DUV() {
+    position = {0, 0};
+    texture = {0, 0};
+  }
 };
 
 int main(int argc, char **argv) {
   // Initialize SDL and open a window
-  SDLWindowManager windowManager(800, 600, "GLImac");
+  SDLWindowManager windowManager(800, 600, "Triangle qui tourne");
 
   // Initialize glew for OpenGL3+ support
   GLenum glewInitError = glewInit();
@@ -35,6 +40,8 @@ int main(int argc, char **argv) {
 
   std::cout << "OpenGL Version : " << glGetString(GL_VERSION) << std::endl;
   std::cout << "GLEW Version : " << glewGetString(GLEW_VERSION) << std::endl;
+
+  GLint loc = glGetUniformLocation(program.getGLId(), "uTime");
 
   /*********************************
    * HERE SHOULD COME THE INITIALIZATION CODE
@@ -58,14 +65,16 @@ int main(int argc, char **argv) {
   // Création d'un vao
   GLuint vao;
   glGenVertexArrays(1, &vao);
+
   // "vao" devient LE vao courant
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBindVertexArray(vao);
   // Activation de l'attribut de vertex 0
   const GLuint VERTEX_ATTR_POSITION = 0;
   const GLuint VERTEX_ATTR_TEXTURE = 1;
   glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
   glEnableVertexAttribArray(VERTEX_ATTR_TEXTURE);
 
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glVertexAttribPointer(VERTEX_ATTR_POSITION, 2, GL_FLOAT, GL_FALSE,
                         sizeof(Vertex2DUV),
                         (const GLvoid *)offsetof(Vertex2DUV, position));
@@ -73,9 +82,6 @@ int main(int argc, char **argv) {
                         sizeof(Vertex2DUV),
                         (const GLvoid *)offsetof(Vertex2DUV, texture));
 
-  // Binding d'un vbo sur la cible gl array buffer
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
   // Debinding d'un vbo sur la cible gl array buffer
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -83,6 +89,7 @@ int main(int argc, char **argv) {
   glBindVertexArray(0);
 
   // Application loop:
+  float deg = 0.f;
   bool done = false;
   while (!done) {
     // Event loop:
@@ -98,9 +105,17 @@ int main(int argc, char **argv) {
      *********************************/
     glClear(GL_COLOR_BUFFER_BIT);
     glBindVertexArray(vao);
+    // deg += 10.f;
+    deg += 0.002f;
+    glUniform1f(loc, deg);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
 
+    /**
+    deg += 0.002f;
+    glm::mat3 turned_matrix = rotate(deg);
+    glUniformMatrix3fv(loc, 1, GL_FALSE, glm::value_ptr(turned_matrix));
+    */
     // Update the display
     windowManager.swapBuffers();
   }
