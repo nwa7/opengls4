@@ -105,12 +105,25 @@ int main(int argc, char **argv) {
   // Debinding vao
   glBindVertexArray(0);
 
+  // Earth img
   GLuint earthTexture = glGetUniformLocation(program.getGLId(), "uTex");
   glGenTextures(1, &earthTexture);
   glBindTexture(GL_TEXTURE_2D, earthTexture);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, earthImg->getWidth(),
                earthImg->getHeight(), 0, GL_RGBA, GL_FLOAT,
                earthImg->getPixels());
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  // Moon img
+  GLuint moonTexture = glGetUniformLocation(program.getGLId(), "uTex");
+  glGenTextures(1, &moonTexture);
+  glBindTexture(GL_TEXTURE_2D, moonTexture);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, moonImg->getWidth(),
+               moonImg->getHeight(), 0, GL_RGBA, GL_FLOAT,
+               moonImg->getPixels());
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -145,10 +158,15 @@ int main(int argc, char **argv) {
 
     glUniformMatrix4fv(loc1, 1, GL_FALSE,
                        glm::value_ptr(ProjMatrix * MVMatrix));
+    MVMatrix = glm::rotate(MVMatrix, 0.005f,
+                           glm::vec3(0.f, 1.f, 0.f)); // Translation * Rotation
     glUniformMatrix4fv(loc2, 1, GL_FALSE, glm::value_ptr(MVMatrix));
     glUniformMatrix4fv(loc3, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
 
     glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
+
+    glBindTexture(GL_TEXTURE_2D, moonTexture);
+    glUniform1i(moonTexture, 0);
 
     for (int i = 0; i < 32; i++) {
 
