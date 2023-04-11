@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
   FilePath applicationPath(argv[0]);
   Program program =
       loadProgram(applicationPath.dirPath() + "shaders/3D.vs.glsl",
-                  applicationPath.dirPath() + "shaders/normal.fs.glsl");
+                  applicationPath.dirPath() + "shaders/tex3D.fs.glsl");
   program.use();
 
   std::cout << "OpenGL Version : " << glGetString(GL_VERSION) << std::endl;
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
   // Debinding vao
   glBindVertexArray(0);
 
-  GLuint earthTexture;
+  GLuint earthTexture = glGetUniformLocation(program.getGLId(), "uTex");
   glGenTextures(1, &earthTexture);
   glBindTexture(GL_TEXTURE_2D, earthTexture);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, earthImg->getWidth(),
@@ -137,6 +137,12 @@ int main(int argc, char **argv) {
      *********************************/
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBindVertexArray(vao);
+
+    // Textures
+
+    glBindTexture(GL_TEXTURE_2D, earthTexture);
+    glUniform1i(earthTexture, 0);
+
     glUniformMatrix4fv(loc1, 1, GL_FALSE,
                        glm::value_ptr(ProjMatrix * MVMatrix));
     glUniformMatrix4fv(loc2, 1, GL_FALSE, glm::value_ptr(MVMatrix));

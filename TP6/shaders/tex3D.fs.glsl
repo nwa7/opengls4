@@ -1,14 +1,12 @@
 #version 330 core
 
-in vec3 vPosition;
-in vec3 vNormal;
-in vec2 VTex;
-uniform sampler2D color;
+//in vec3 vPosition;
+//in vec3 vNormal;
+in vec2 vTex;
+uniform sampler2D uTex;
 
-
-out vec4 fFragColor;
+out vec3 coordText;
 
 void main() {
-    fFragColor = vec4(normalize(vNormal), 1.0f);
-
+    coordText = texture(uTex, vTex).xyz;
 }
