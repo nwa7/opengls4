@@ -32,6 +32,25 @@ int main(int argc, char **argv) {
   std::cout << "OpenGL Version : " << glGetString(GL_VERSION) << std::endl;
   std::cout << "GLEW Version : " << glewGetString(GLEW_VERSION) << std::endl;
 
+  /*********************************
+   * HERE SHOULD COME THE INITIALIZATION CODE
+   *********************************/
+  Sphere sphere(1, 32, 16);
+  // Création d'un vbo
+  GLuint vbo;
+  // La variable vbo contient désormais l'identifiant d'un vbo
+  glGenBuffers(1, &vbo);
+  // Binding d'un vbo sur la cible gl_array_buffer
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  // On peut maintenant modifier le vbo en passant par la cible gl_array_buffer
+
+  int tabSize = sphere.getVertexCount();
+  glBufferData(GL_ARRAY_BUFFER, tabSize * sizeof(ShapeVertex),
+               sphere.getDataPointer(), GL_STATIC_DRAW);
+
+  // Debinding dun VBO sur la cible gl_array_buffer
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
   GLint loc1 = glGetUniformLocation(program.getGLId(), "uMVPMatrix");
   GLint loc2 = glGetUniformLocation(program.getGLId(), "uMVMatrix");
   GLint loc3 = glGetUniformLocation(program.getGLId(), "uNormalMatrix");
@@ -42,32 +61,10 @@ int main(int argc, char **argv) {
   glm::mat4 NormalMatrix;
 
   ProjMatrix =
-      glm::perspective(glm::radians(70.f), largeur / hauteur, 0.f, 100.f);
-  MVMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.f, -5.f));
+      glm::perspective(glm::radians(70.f), largeur / hauteur, 0.1f, 100.f);
+  MVMatrix = glm::translate(MVMatrix, glm::vec3(0, 0, -5));
   NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
-  /*********************************
-   * HERE SHOULD COME THE INITIALIZATION CODE
-   *********************************/
-  // Création d'un vbo
-  GLuint vbo;
-  Sphere sphere(1, 32, 16);
-  // La variable vbo contient désormais l'identifiant d'un vbo
-  glGenBuffers(1, &vbo);
-  // Binding d'un vbo sur la cible gl_array_buffer
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  // On peut maintenant modifier le vbo en passant par la cible gl_array_buffer
 
-  int tabSize = sphere.getVertexCount();
-  const glimac::ShapeVertex *dataPointer = sphere.getDataPointer();
-  ShapeVertex vertices[tabSize];
-  for (int i = 0; i < tabSize; i++) {
-    vertices[i] = dataPointer[i];
-  };
-  glBufferData(GL_ARRAY_BUFFER, tabSize * sizeof(ShapeVertex), vertices,
-               GL_STATIC_DRAW);
-
-  // Debinding dun VBO sur la cible gl_array_buffer
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
   // Création d'un vao
   GLuint vao;
   glGenVertexArrays(1, &vao);
@@ -114,12 +111,12 @@ int main(int argc, char **argv) {
      * HERE SHOULD COME THE RENDERING CODE
      *********************************/
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBindVertexArray(vao);
     glUniformMatrix4fv(loc1, 1, GL_FALSE,
                        glm::value_ptr(ProjMatrix * MVMatrix));
     glUniformMatrix4fv(loc2, 1, GL_FALSE, glm::value_ptr(MVMatrix));
     glUniformMatrix4fv(loc3, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
 
-    glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
     // Update the display
     windowManager.swapBuffers();
