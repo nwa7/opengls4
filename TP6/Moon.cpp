@@ -1,3 +1,4 @@
+#include "glimac/Image.hpp"
 #include "glimac/Sphere.hpp"
 #include "glimac/common.hpp"
 #include <GL/glew.h>
@@ -23,6 +24,13 @@ int main(int argc, char **argv) {
     std::cerr << glewGetErrorString(glewInitError) << std::endl;
     return EXIT_FAILURE;
   }
+  auto moonImg =
+      (loadImage("/home/noi7/Documents/IMAC_A2/OpenGL/GLImac-Template/"
+                 "assets/textures/MoonMap.jpg"));
+  auto earthImg =
+      (loadImage("/home/noi7/Documents/IMAC_A2/OpenGL/GLImac-Template/"
+                 "assets/textures/EarthMap.jpg"));
+
   FilePath applicationPath(argv[0]);
   Program program =
       loadProgram(applicationPath.dirPath() + "shaders/3D.vs.glsl",
@@ -35,6 +43,7 @@ int main(int argc, char **argv) {
   /*********************************
    * HERE SHOULD COME THE INITIALIZATION CODE
    *********************************/
+
   Sphere sphere(1, 32, 16);
   // Création d'un vbo
   GLuint vbo;
@@ -96,6 +105,17 @@ int main(int argc, char **argv) {
   // Debinding vao
   glBindVertexArray(0);
 
+  GLuint earthTexture;
+  glGenTextures(1, &earthTexture);
+  glBindTexture(GL_TEXTURE_2D, earthTexture);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, earthImg->getWidth(),
+               earthImg->getHeight(), 0, GL_RGBA, GL_FLOAT,
+               earthImg->getPixels());
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  glBindTexture(GL_TEXTURE_2D, 0);
   std::vector<glm::vec3> axis;
   for (int i = 0; i < 32; i++) {
     axis.push_back(glm::sphericalRand(1.0f));
@@ -156,5 +176,6 @@ int main(int argc, char **argv) {
 
   glDeleteVertexArrays(1, &vao);
   glDeleteBuffers(1, &vbo);
+  glDeleteTextures(1, &earthTexture);
   return EXIT_SUCCESS;
 }
