@@ -96,6 +96,11 @@ int main(int argc, char **argv) {
   // Debinding vao
   glBindVertexArray(0);
 
+  std::vector<glm::vec3> axis;
+  for (int i = 0; i < 32; i++) {
+    axis.push_back(glm::sphericalRand(1.0f));
+  };
+
   // Application loop:
   bool done = false;
   while (!done) {
@@ -119,26 +124,32 @@ int main(int argc, char **argv) {
 
     glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
 
-    glm::mat4 MVMatrix =
-        glm::translate(glm::mat4(1), glm::vec3(0, 0, -5)); // Translation
-    MVMatrix = glm::rotate(MVMatrix, windowManager.getTime(),
-                           glm::vec3(0, 1, 0)); // Translation * Rotation
-    MVMatrix = glm::translate(
-        MVMatrix, glm::vec3(-2, 0, 0)); // Translation * Rotation * Translation
-    MVMatrix = glm::scale(
-        MVMatrix,
-        glm::vec3(0.2, 0.2,
-                  0.2)); // Translation * Rotation * Translation * Scale
+    for (int i = 0; i < 32; i++) {
 
-    // Pass the new MVMatrix to the shader
-    glUniformMatrix4fv(loc1, 1, GL_FALSE,
-                       glm::value_ptr(ProjMatrix * MVMatrix));
-    glUniformMatrix4fv(loc2, 1, GL_FALSE, glm::value_ptr(MVMatrix));
-    glUniformMatrix4fv(loc3, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+      glm::mat4 MVMatrix =
+          glm::translate(glm::mat4(1), glm::vec3(0, 0, -5)); // Translation
+      MVMatrix = glm::rotate(MVMatrix, windowManager.getTime(),
+                             axis[i]); // Translation * Rotation
+      MVMatrix =
+          glm::translate(MVMatrix,
+                         axis[i + 1]); // Translation * Rotation * Translation
+      MVMatrix =
+          glm::translate(MVMatrix,
+                         axis[i + 1]); // Translation * Rotation * Translation
+      MVMatrix = glm::scale(
+          MVMatrix,
+          glm::vec3(0.2, 0.2,
+                    0.2)); // Translation * Rotation * Translation * Scale
 
-    // Draw the new sphere
-    glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
+      // Pass the new MVMatrix to the shader
+      glUniformMatrix4fv(loc1, 1, GL_FALSE,
+                         glm::value_ptr(ProjMatrix * MVMatrix));
+      glUniformMatrix4fv(loc2, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+      glUniformMatrix4fv(loc3, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
 
+      // Draw the new sphere
+      glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
+    }
     // Update the display
     windowManager.swapBuffers();
   }
