@@ -1,5 +1,6 @@
 #include "glimac/Image.hpp"
 #include "glimac/Sphere.hpp"
+#include "glimac/TrackballCamera.hpp"
 #include "glimac/common.hpp"
 #include <GL/glew.h>
 #include <algorithm>
@@ -48,6 +49,7 @@ int main(int argc, char **argv) {
    *********************************/
 
   Sphere sphere(1, 32, 16);
+  TrackballCamera cam;
 
   GLint loc1 = glGetUniformLocation(program.getGLId(), "uMVPMatrix");
   GLint loc2 = glGetUniformLocation(program.getGLId(), "uMVMatrix");
